@@ -1,0 +1,21 @@
+#!/bin/bash
+
+#Download Trust+ Database
+echo "Downloading Trust+ database"
+wget --no-check-certificate https://trustpositif.kominfo.go.id/assets/db/domains_isp
+
+#Remove existing db.rpz.local
+echo "Removing db.rpz.local"
+rm -rf /etc/bind/db.rpz.local
+
+echo "Copying db.rpz.local from template"
+cp /home/db.rpz.local /etc/bind/
+
+echo "Input database Trust+ to db.rpz.local"
+awk '{print $1" IN CNAME @"}' domains_isp >> /etc/bind/db.rpz.local
+
+echo "Removing Trust+ Database"
+rm domains_isp
+
+echo "Reload RNDC"
+rndc reload
